@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -99,7 +100,7 @@ public class GoogleSheetAPI {
 //        	      .execute();
        // validating_Assertion_to_Sheet();
     }
-    public static void validating_Assertion_to_Sheet(String id) throws Exception {
+    public static String validating_Assertion_to_Sheet(String id,String status) throws Exception {
     	 int i=0;
     	 final String spreadsheetId = "1N61Do4aJhtUQJcRCR1_ybd4HbnaKbDw7ig3tLh1sJ9I";
  	    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -116,21 +117,24 @@ public class GoogleSheetAPI {
          List<List<Object>> values = response.getValues();
        for (List row : values) {
            if(row.get(0).equals(id)) {
+        	  
            	break;
            }
            i++;
        }
-       System.out.println("A"+(i+1));
+       System.out.println();
        List<List<Object>> values1=new ArrayList<List<Object>>();
      
      List<Object> add=new ArrayList<Object>();
-     add.add("Pass");
+     add.add(status);
      values1.add(add);
          ValueRange body = new ValueRange()
      	      .setValues(values1);
      	    UpdateValuesResponse result =service.spreadsheets().values()
      	      .update(spreadsheetId, "E"+(i+1), body).setValueInputOption("RAW")
      	      .execute();
-       
-    }    
+     return status;  
+    }
+
+	   
 }

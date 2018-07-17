@@ -1,23 +1,30 @@
 package Steps;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
-
 import com.qait.automation.GoogleApi.GoogleSheetAPI;
 import com.qait.automation.GoogleApi.LoginAction;
 
+import cucumber.api.Scenario;
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
 public class LoginTest {
 	WebDriver driver;
-	LoginAction login;	
+	LoginAction login;
+	String id;
+	@Before
+	public void gettingID(Scenario scenario) {
+		
+		System.out.println("executed");
+	}
 	
 	@Given("^I open HRIS Application$")
 	public void i_open_HRIS_Application() throws Throwable {
@@ -34,16 +41,8 @@ public class LoginTest {
 	@Then("^assertion for time sheet page$")
 	public void assertion_for_time_sheet_page() throws Throwable {
 		Assert.assertNotEquals(driver.getCurrentUrl(), "https://hris.qainfotech.com/login.php");
-		Thread.sleep(2000);
-		List<WebElement> li = driver.findElements(By.className("topbar-list"));
-		li.get(0).click();
-		String id="ID_01";
-		GoogleSheetAPI.validating_Assertion_to_Sheet(id);
+		login.logout();
 		
-		WebElement logout = driver.findElement(By.xpath("//li//a//span[text()='Logout']"));
-		Thread.sleep(3000);
-		logout.click();
-		driver.close();
 	}
 
 	@When("^I enter invalid credentials$")
@@ -56,9 +55,6 @@ public class LoginTest {
 	public void assertion_for_invalid_login_text() throws Throwable {
 		Assert.assertTrue(driver.findElement(By.className("loginTxt"))
 				.getText().contains("Invalid Login"));
-		String id="ID_02";
-		GoogleSheetAPI.validating_Assertion_to_Sheet(id);
-		driver.close();
 	}
 
 	@When("^I do not enter Password$")
@@ -70,10 +66,16 @@ public class LoginTest {
 	@Then("^assertion for style attribute to be red$")
 	public void assertion_for_style_attribute_to_be_red() throws Throwable {
 		Assert.assertTrue(driver.findElement(By.id("txtPassword")).getAttribute("style").contains("red"));
-		driver.close();
-		String id="ID_03";
-		GoogleSheetAPI.validating_Assertion_to_Sheet(id);
 	}
 
+	@After
+	public void validation(Scenario scenario) throws Exception {
+		
+		id=scenario.getSourceTagNames().toString();
+		String id1=id.substring(2,7);
+		System.out.println(id1);
+		GoogleSheetAPI.validating_Assertion_to_Sheet(id1,"Pass");
+		login.closingDriver();
+	}
 	
 }
